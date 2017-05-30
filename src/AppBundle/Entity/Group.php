@@ -18,7 +18,7 @@ class Group
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="AppBundle\Entity\User", mappedBy="group", fetch="EAGER", cascade={"persist", "merge", "refresh", "remove"})
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\User", mappedBy="group")
      * @var ArrayCollection
      */
     private $members;
