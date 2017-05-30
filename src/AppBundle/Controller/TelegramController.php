@@ -24,7 +24,7 @@ class TelegramController extends Controller
 
         $bot = new BotClient($telegramApiKey);
 
-        $bot->command('start', function ($message) use ($bot) {
+        $bot->command('start', function ($message) use ($bot, $this) {
             $answer =
                 'Здравствуйте! 
                 Я – be-half, помогу вам следить за тратами "надвоих". 
