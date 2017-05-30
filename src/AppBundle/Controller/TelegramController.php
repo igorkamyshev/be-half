@@ -41,9 +41,19 @@ class TelegramController extends Controller
         if ($text) {
             switch ($text) {
                 case '/start':
+                    $replyMarkup = $telegram->replyKeyboardMarkup([
+                        'keyboard' => $keyboard,
+                        'resize_keyboard' => true,
+                        'one_time_keyboard' => false
+                    ]);
                     $telegram->sendMessage([
-                        'chat_id' => $chatId,
-                        'text' => 'ok',
+                        'chat_id'      => $chatId,
+                        'text'         => 'Здравствуйте! Я – be-half, помогу следить за тратами "надвоих".',
+                    ]);
+                    $telegram->sendMessage([
+                        'chat_id'      => $chatId,
+                        'text'         => 'Для начала создайте группу, или присоединитесь к существующей.',
+                        'reply_markup' => $replyMarkup,
                     ]);
                     break;
             }
@@ -53,7 +63,7 @@ class TelegramController extends Controller
 
 //
 //        $bot->command('start', function ($message) use ($bot, &$controller) {
-//            $answer = 'Здравствуйте! Я – be-half, помогу вам следить за тратами "надвоих". Для начала создайте группу, или присоединитесь к существующей.';
+//            $answer = '';
 //
 //            $keyboard = new BotKeyboard([['/create', '/join']], null, true);
 //
