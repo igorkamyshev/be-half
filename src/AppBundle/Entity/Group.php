@@ -11,7 +11,8 @@ class Group
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY"")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(type="integer")
      * @var int
      */
     private $id;
