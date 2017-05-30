@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Telegram\Bot\Api as TelegramApi;
+use \Telegram\Bot\Api as TelegramApi;
 
 class TelegramController extends Controller
 {
