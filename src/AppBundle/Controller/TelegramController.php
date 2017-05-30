@@ -80,19 +80,24 @@ class TelegramController extends Controller
     }
 
     private function createGroup(User $user) {
-        $group = $user->getGroup();
+//        $group = $user->getGroup();
+//
+//        if (!$group) {
+//            $em = $this->getDoctrine()->getManager();
+//
+//            $group = new Group();
+//            $em->persist($group);
+//
+////            $user->setGroup($group);
+////            $group->addMember($user);
+//
+//            $em->flush();
+//        }
 
-        if (!$group) {
-            $em = $this->getDoctrine()->getManager();
-
-            $group = new Group();
-            $em->persist($group);
-
-//            $user->setGroup($group);
-//            $group->addMember($user);
-
-            $em->flush();
-        }
+        $em = $this->getDoctrine()->getManager();
+        $group = new Group();
+        $em->persist($group);
+        $em->flush();
 
         return $group;
     }
