@@ -23,7 +23,7 @@ class User
     private $telegramChatId;
 
     /**
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Group", cascade={"persist", "merge", "refresh", "remove"})
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Group", cascade={"persist", "merge", "refresh", "remove"}, mappedBy="members")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="group_id", referencedColumnName="id")
      * })
