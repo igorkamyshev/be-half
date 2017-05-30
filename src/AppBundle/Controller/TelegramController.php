@@ -6,7 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use \TelegramBot\Api\Client as TelegramBot;
+use \TelegramBot\Api\Client as BotClient;
 
 class TelegramController extends Controller
 {
@@ -21,7 +21,7 @@ class TelegramController extends Controller
             throw $this->createAccessDeniedException();
         }
 
-        $bot = new TelegramBot($telegramApiKey);
+        $bot = new BotClient($telegramApiKey);
 
         $bot->run();
 
