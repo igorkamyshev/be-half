@@ -23,6 +23,15 @@ class User
     private $telegramChatId;
 
     /**
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Group", cascade={"persist", "merge", "refresh", "remove"})
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="group_id", referencedColumnName="id")
+     * })
+     * @var \AppBundle\Entity\Group
+     */
+    protected $group;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -45,6 +54,24 @@ class User
     public function setTelegramChatId($telegramChatId)
     {
         $this->telegramChatId = $telegramChatId;
+        return $this;
+    }
+
+    /**
+     * @return Group
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param Group $group
+     * @return User
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
         return $this;
     }
 }

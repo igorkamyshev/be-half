@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Group;
 use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -29,10 +30,7 @@ class TelegramController extends Controller
         $controller = $this;
 
         $bot->command('start', function ($message) use ($bot, &$controller) {
-            $answer = 'Здравствуйте! Я – be-half, помогу вам следить за тратами "надвоих". Для начала создайте группу, или присоединитесь к существующей.';
-
-            /** @var User $user */
-            $user = $controller->getOrCreteUser($message->getChat()->getId());
+            $answer = 'Здравствуйте!\n Я – be-half, помогу вам следить за тратами "надвоих".\n Для начала создайте группу, или присоединитесь к существующей.';
 
             $keyboard = new BotKeyboard([['/create', '/join']], null, true);
 
@@ -40,7 +38,12 @@ class TelegramController extends Controller
         });
 
         $bot->command('create', function ($message) use ($bot, &$controller) {
-            $answer = 'created!';
+            /** @var User $user */
+            $user = $controller->getOrCreteUser($message->getChat()->getId());
+
+            $group = $controller->createGroup($user);
+
+            $answer = 'Группа создана (id ' . $group->getId() . ').\n Чтобы пригласить друга в группу отправьте ему id.\n Для создания транзакций отправляйте мне сообщения с суммой долги и комментарием (Напрмиер: 300 булочки на ужин).';
 
             $bot->sendMessage($message->getChat()->getId(), $answer);
         });
@@ -66,9 +69,28 @@ class TelegramController extends Controller
             $user = (new User())->setTelegramChatId($chatId);
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
+
             $em->flush();
         }
 
         return $user;
+    }
+
+    private function createGroup(User $user) {
+        $em = $this->getDoctrine()->getManager();
+
+        $group = $user->getGroup();
+
+        if (!$group) {
+            $group = (new Group())->addMember($user);
+            $user->setGroup($group);
+
+            $em->persist($group);
+            $em->persist($user);
+
+            $em->flush();
+        }
+
+        return $group;
     }
 }
