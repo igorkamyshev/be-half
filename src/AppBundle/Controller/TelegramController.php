@@ -24,14 +24,16 @@ class TelegramController extends Controller
 
         $bot = new BotClient($telegramApiKey);
 
-        $bot->command('start', function ($message) use ($bot, $this) {
+        $controller = $this;
+
+        $bot->command('start', function ($message) use ($bot, &$controller) {
             $answer =
                 'Здравствуйте! 
                 Я – be-half, помогу вам следить за тратами "надвоих". 
                 Для начала создайте группу, или присоединитесь к существующей.';
 
             /** @var User $user */
-            $user = $this->getOrCreteUser($message->getChat()->getId());
+            $user = $controller->getOrCreteUser($message->getChat()->getId());
 
             $answer = $answer . $user->getId();
 
