@@ -39,11 +39,13 @@ class TelegramController extends Controller
 
         $bot->command('create', function ($message) use ($bot, &$controller) {
             /** @var User $user */
-            $user = $controller->getOrCreteUser($message->getChat()->getId());
+            $user = $controller
+                ->getOrCreateUser($message->getChat()->getId());
 
-            $group = $controller->createGroup($user);
+            $group = $controller
+                ->createGroup($user);
 
-            $answer = 'Группа создана (id ' . $group->getId() . ').\n Чтобы пригласить друга в группу отправьте ему id.\n Для создания транзакций отправляйте мне сообщения с суммой долги и комментарием (Напрмиер: 300 булочки на ужин).';
+            $answer = 'Группа создана (id ' . $group->getId() . ').\n Чтобы пригласить друга в группу отправьте ему id.\n Для создания транзакций отправляйте мне сообщения с суммой долга и комментарием (Напрмиер: 300 булочки на ужин).';
 
             $bot->sendMessage($message->getChat()->getId(), $answer);
         });
@@ -59,7 +61,7 @@ class TelegramController extends Controller
         return new Response($apiKey);
     }
 
-    private function getOrCreteUser($chatId) {
+    private function getOrCreateUser($chatId) {
         $user = $this
             ->getDoctrine()
             ->getRepository(User::class)
@@ -67,6 +69,7 @@ class TelegramController extends Controller
 
         if (!$user) {
             $user = (new User())->setTelegramChatId($chatId);
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
 
@@ -77,14 +80,13 @@ class TelegramController extends Controller
     }
 
     private function createGroup(User $user) {
-        $em = $this->getDoctrine()->getManager();
-
         $group = $user->getGroup();
 
         if (!$group) {
             $group = (new Group())->addMember($user);
             $user->setGroup($group);
 
+            $em = $this->getDoctrine()->getManager();
             $em->persist($group);
             $em->persist($user);
 
