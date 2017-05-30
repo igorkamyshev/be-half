@@ -85,11 +85,11 @@ class TelegramController extends Controller
         if (!$group) {
             $em = $this->getDoctrine()->getManager();
 
-            $group = (new Group())->addMember($user);
+            $group = new Group();
             $em->persist($group);
 
             $user->setGroup($group);
-            $em->persist($user);
+            $group->addMember($user);
 
             $em->flush();
         }
