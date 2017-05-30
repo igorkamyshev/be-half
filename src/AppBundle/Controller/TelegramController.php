@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use \Telegram\Bot\Api as TelegramApi;
+use Telegram\Bot\Api;
 
 class TelegramController extends Controller
 {
@@ -24,7 +24,7 @@ class TelegramController extends Controller
             throw $this->createAccessDeniedException();
         }
 
-        $telegram = new TelegramApi($telegramApiKey);
+        $telegram = new Api($telegramApiKey);
 
         $request = $telegram->getWebhookUpdates();
 
