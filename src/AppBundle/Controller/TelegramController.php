@@ -87,10 +87,9 @@ class TelegramController extends Controller
 
             $group = new Group();
             $em->persist($group);
-            $em->flush();
 
-            $user->setGroup($group);
-            $group->addMember($user);
+//            $user->setGroup($group);
+//            $group->addMember($user);
 
             $em->flush();
         }
