@@ -23,12 +23,12 @@ class TelegramController extends Controller
 
         $bot = new BotClient($telegramApiKey);
 
-        $bot->run();
-
         $bot->command('start', function ($message) use ($bot) {
             $answer = 'It works!';
             $bot->sendMessage($message->getChat()->getId(), $answer);
         });
+
+        $bot->run();
 
         return new Response($apiKey);
     }
