@@ -10,7 +10,7 @@ class User
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="Identity")
      * @ORM\Column(type="integer")
      * @var int
      */
@@ -32,7 +32,7 @@ class User
     protected $group;
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {

@@ -30,7 +30,7 @@ class TelegramController extends Controller
         $controller = $this;
 
         $bot->command('start', function ($message) use ($bot, &$controller) {
-            $answer = 'Здравствуйте!\n Я – be-half, помогу вам следить за тратами "надвоих".\n Для начала создайте группу, или присоединитесь к существующей.';
+            $answer = 'Здравствуйте! Я – be-half, помогу вам следить за тратами "надвоих". Для начала создайте группу, или присоединитесь к существующей.';
 
             $keyboard = new BotKeyboard([['/create', '/join']], null, true);
 
@@ -45,7 +45,7 @@ class TelegramController extends Controller
             $group = $controller
                 ->createGroup($user);
 
-            $answer = 'Группа создана (id ' . $group->getId() . ').\n Чтобы пригласить друга в группу отправьте ему id.\n Для создания транзакций отправляйте мне сообщения с суммой долга и комментарием (Напрмиер: 300 булочки на ужин).';
+            $answer = 'Группа создана (id ' . $group->getId() . '). Чтобы пригласить друга в группу отправьте ему id. Для создания транзакций отправляйте мне сообщения с суммой долга и комментарием (Напрмиер: 300 булочки на ужин).';
 
             $bot->sendMessage($message->getChat()->getId(), $answer);
         });
@@ -88,8 +88,8 @@ class TelegramController extends Controller
 //            $group = new Group();
 //            $em->persist($group);
 //
-////            $user->setGroup($group);
-////            $group->addMember($user);
+//            $user->setGroup($group);
+//              $group->addMember($user);
 //
 //            $em->flush();
 //        }

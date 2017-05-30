@@ -11,7 +11,7 @@ class Group
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="Identity"")
      * @ORM\Column(type="integer")
      * @var int
      */
