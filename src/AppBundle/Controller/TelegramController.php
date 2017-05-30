@@ -7,7 +7,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
 use \TelegramBot\Api\Client as BotClient;
+use \TelegramBot\Api\Types\ReplyKeyboardMarkup as BotKeyboard;
 
 class TelegramController extends Controller
 {
@@ -27,15 +29,24 @@ class TelegramController extends Controller
         $controller = $this;
 
         $bot->command('start', function ($message) use ($bot, &$controller) {
-            $answer =
-                'Здравствуйте! 
-                Я – be-half, помогу вам следить за тратами "надвоих". 
-                Для начала создайте группу, или присоединитесь к существующей.';
+            $answer = 'Здравствуйте! Я – be-half, помогу вам следить за тратами "надвоих". Для начала создайте группу, или присоединитесь к существующей.';
 
             /** @var User $user */
             $user = $controller->getOrCreteUser($message->getChat()->getId());
 
-            $answer = $answer . $user->getId();
+            $keyboard = new BotKeyboard([['/create', '/join']], null, true);
+
+            $bot->sendMessage($message->getChat()->getId(), $answer, false, null, null, $keyboard);
+        });
+
+        $bot->command('create', function ($message) use ($bot, &$controller) {
+            $answer = 'created!';
+
+            $bot->sendMessage($message->getChat()->getId(), $answer);
+        });
+
+        $bot->command('join', function ($message) use ($bot, &$controller) {
+            $answer = 'joined!';
 
             $bot->sendMessage($message->getChat()->getId(), $answer);
         });
