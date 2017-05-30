@@ -9,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+include('../../../vendor/autoload.php');
+
 use Telegram\Bot\Api;
 
 class TelegramController extends Controller
