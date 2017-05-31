@@ -4,6 +4,7 @@ namespace AppBundle\Utils;
 
 
 use AppBundle\Entity\Band;
+use AppBundle\Entity\Transaction;
 use AppBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 
@@ -75,11 +76,34 @@ class LoanManager
         $band->addMember($user);
         $user->setBand($band);
 
-        $this->em->persist($band);
-        $this->em->persist($user);
-
         $this->em->flush();
 
         return $band;
+    }
+
+    public function createTransaction(User $user, $amount)
+    {
+        $transaction = (new Transaction())
+            ->setAmount($amount)
+            ->setUser($user);
+
+        $this->em->persist($transaction);
+
+        $user->addTransaction($transaction);
+        $user->setBalance($user->getBalance() + $transaction->getAmount());
+
+        /** @var User $partner */
+        $partner = null;
+
+        foreach ($user->getBand()->getMembers() as $member) {
+            if ($member->getId() != $user->getId()) {
+                $partner = $member;
+                break;
+            }
+        }
+
+        $partner->setBalance($partner->getBalance() - $transaction->getAmount());
+
+        $this->em->flush();
     }
 }

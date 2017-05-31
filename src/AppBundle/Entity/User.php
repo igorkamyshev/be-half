@@ -145,9 +145,13 @@ class User
      * @param Transaction $transaction
      * @return User
      */
-    public function setTransaction(Transaction $transaction)
+    public function addTransaction(Transaction $transaction)
     {
         $this->transactions->add($transaction);
+
+        $this->band->addTransaction($transaction);
+        $transaction->setBand($this->band);
+
         return $this;
     }
 
