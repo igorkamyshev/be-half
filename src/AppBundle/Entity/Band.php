@@ -24,9 +24,16 @@ class Band
      */
     private $members;
 
+    /**
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Transaction", mappedBy="band")
+     * @var ArrayCollection
+     */
+    private $transactions;
+
     public function __construct()
     {
         $this->members = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     /**
@@ -63,6 +70,34 @@ class Band
     public function removeMember(User $member)
     {
         $this->members->removeElement($member);
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTransactions()
+    {
+        return $this->transactions;
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @return Band
+     */
+    public function addTransaction(Transaction $transaction)
+    {
+        $this->transactions->add($transaction);
+        return $this;
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @return Band
+     */
+    public function removeTransaction(Transaction $transaction)
+    {
+        $this->transactions->removeElement($transaction);
         return $this;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Entity;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -36,10 +37,21 @@ class User
     private $band;
 
     /**
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Transaction", mappedBy="user")
+     * @var ArrayCollection
+     */
+    private $transactions;
+
+    /**
      * @ORM\Column(type="float")
      * @var float
      */
     private $balance = 0;
+
+    public function __construct()
+    {
+        $this->transactions = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -118,6 +130,34 @@ class User
     public function setBalance($balance)
     {
         $this->balance = $balance;
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTransactions()
+    {
+        return $this->transactions;
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @return User
+     */
+    public function setTransaction(Transaction $transaction)
+    {
+        $this->transactions->add($transaction);
+        return $this;
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @return User
+     */
+    public function removeTransaction(Transaction $transaction)
+    {
+        $this->transactions->removeElement($transaction);
         return $this;
     }
 }
