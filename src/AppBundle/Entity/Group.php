@@ -17,10 +17,11 @@ class Group
      */
     private $id;
 
-    public function __construct()
-    {
-        $this->members = new ArrayCollection();
-    }
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string
+     */
+    private $name;
 
     /**
      * @return int
@@ -28,5 +29,23 @@ class Group
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return Group
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
     }
 }
