@@ -15,6 +15,9 @@ use Telegram\Bot\Api;
 
 class TelegramController extends Controller
 {
+    /* Command Constant */
+
+
     /** @var  Api */
     private $telegram;
 
@@ -39,7 +42,7 @@ class TelegramController extends Controller
         $text = $request["message"]["text"];
 
         try {
-            $firstWord = strtolower(substr($text, 0, strpos($text, " ")));
+            $firstWord = mb_strtolower(substr($text, 0, strpos($text, " ")));
         } catch (\Exception $e) {
             $firstWord = null;
         }
