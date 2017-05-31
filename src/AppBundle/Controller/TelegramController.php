@@ -69,11 +69,11 @@ class TelegramController extends Controller
                             'text'         => 'Вы уже состоите в группе!',
                         ]);
                     } else {
-                        $group = $lm->createGroup($user);
+                        $band = $lm->createBand($user);
 
                         $telegram->sendMessage([
                             'chat_id'      => $chatId,
-                            'text'         => 'Группа создана! Индивидуальный номер – ' . $group->getId(),
+                            'text'         => 'Группа создана! Индивидуальный номер – ' . $band->getId(),
                         ]);
                     }
                     break;

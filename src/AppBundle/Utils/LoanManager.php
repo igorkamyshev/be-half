@@ -3,7 +3,7 @@
 namespace AppBundle\Utils;
 
 
-use AppBundle\Entity\Group;
+use AppBundle\Entity\Band;
 use AppBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 
@@ -51,12 +51,12 @@ class LoanManager
 
     /**
      * @param User $user
-     * @return Group
+     * @return Band
      */
-    public function createGroup(User $user) {
-        $group = (new Group())->setName('group name');
+    public function createBand(User $user) {
+        $band = new Band();
 
-        $this->em->persist($group);
+        $this->em->persist($band);
         $this->em->flush();
     }
 }
