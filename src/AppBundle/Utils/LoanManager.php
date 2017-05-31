@@ -58,5 +58,7 @@ class LoanManager
 
         $this->em->persist($band);
         $this->em->flush();
+
+        return $band;
     }
 }
