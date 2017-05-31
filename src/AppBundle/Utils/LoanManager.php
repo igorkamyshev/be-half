@@ -54,9 +54,12 @@ class LoanManager
      * @return Band
      */
     public function createBand(User $user) {
-        $band = new Band();
+        $band = (new Band())->addMember($user);
 
         $this->em->persist($band);
+
+        $user->setBand($band);
+
         $this->em->flush();
 
         return $band;

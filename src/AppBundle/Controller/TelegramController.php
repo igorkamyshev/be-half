@@ -63,7 +63,7 @@ class TelegramController extends Controller
                     ]);
                     break;
                 case 'Создать группу':
-                    if (false) {
+                    if ($user->getBand()) {
                         $telegram->sendMessage([
                             'chat_id'      => $chatId,
                             'text'         => 'Вы уже состоите в группе!',
@@ -83,28 +83,5 @@ class TelegramController extends Controller
         }
 
         return new Response($apiKey);
-    }
-
-    private function createGroup(User $user) {
-//        $group = $user->getGroup();
-//
-//        if (!$group) {
-//            $em = $this->getDoctrine()->getManager();
-//
-//            $group = new Group();
-//            $em->persist($group);
-//
-//            $user->setGroup($group);
-//              $group->addMember($user);
-//
-//            $em->flush();
-//        }
-
-        $em = $this->getDoctrine()->getManager();
-        $group = new Group();
-        $em->persist($group);
-        $em->flush();
-
-        return $group;
     }
 }

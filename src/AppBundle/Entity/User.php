@@ -29,6 +29,13 @@ class User
     private $name;
 
     /**
+     * @ManyToOne(targetEntity="AppBundle\Entity\Band", inversedBy="members")
+     * @JoinColumn(name="band_id", referencedColumnName="id")
+     * @var Band
+     */
+    private $band;
+
+    /**
      * @return int
      */
     public function getId()
@@ -55,7 +62,7 @@ class User
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -63,12 +70,30 @@ class User
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      * @return User
      */
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return Band
+     */
+    public function getBand()
+    {
+        return $this->band;
+    }
+
+    /**
+     * @param Band $band
+     * @return User
+     */
+    public function setBand($band)
+    {
+        $this->band = $band;
         return $this;
     }
 }
