@@ -32,19 +32,18 @@ class TelegramController extends Controller
         $chatId = $request["message"]["chat"]["id"];
         $name = $request["message"]["from"]["username"];
 
-        $keyboard = [
-            ["Создать группу"],
-            ["Вступить в группу"],
-            ["Статистика"]
-        ];
+        $user = $this->getOrCreateUser($chatId, $name);
 
         if ($text) {
             switch ($text) {
                 case '/start':
                     $replyMarkup = $telegram->replyKeyboardMarkup([
-                        'keyboard' => $keyboard,
+                        'keyboard' => [
+                            ["Создать группу"],
+                            ["Вступить в группу"],
+                        ],
                         'resize_keyboard' => true,
-                        'one_time_keyboard' => false
+                        'one_time_keyboard' => true,
                     ]);
                     $telegram->sendMessage([
                         'chat_id'      => $chatId,
@@ -61,47 +60,19 @@ class TelegramController extends Controller
 
         }
 
-//
-//        $bot->command('start', function ($message) use ($bot, &$controller) {
-//            $answer = '';
-//
-//            $keyboard = new BotKeyboard([['/create', '/join']], null, true);
-//
-//            $bot->sendMessage($message->getChat()->getId(), $answer, false, null, null, $keyboard);
-//        });
-//
-//        $bot->command('create', function ($message) use ($bot, &$controller) {
-//            /** @var User $user */
-//            $user = $controller
-//                ->getOrCreateUser($message->getChat()->getId());
-//
-//            $group = $controller
-//                ->createGroup($user);
-//
-//            $answer = 'Группа создана (id ' . $group->getId() . '). Чтобы пригласить друга в группу отправьте ему id. Для создания транзакций отправляйте мне сообщения с суммой долга и комментарием (Напрмиер: 300 булочки на ужин).';
-//
-//            $bot->sendMessage($message->getChat()->getId(), $answer);
-//        });
-//
-//        $bot->command('join', function ($message) use ($bot, &$controller) {
-//            $answer = 'joined!';
-//
-//            $bot->sendMessage($message->getChat()->getId(), $answer);
-//        });
-//
-//        $bot->run();
-
         return new Response($apiKey);
     }
 
-    private function getOrCreateUser($chatId) {
+    private function getOrCreateUser($chatId, $name) {
         $user = $this
             ->getDoctrine()
             ->getRepository(User::class)
             ->findOneBy(['telegramChatId' => $chatId]);
 
         if (!$user) {
-            $user = (new User())->setTelegramChatId($chatId);
+            $user = (new User())
+                ->setTelegramChatId($chatId)
+                ->setName($name);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
