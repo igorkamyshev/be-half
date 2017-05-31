@@ -29,8 +29,8 @@ class User
     private $name;
 
     /**
-     * @ManyToOne(targetEntity="AppBundle\Entity\Band", inversedBy="members")
-     * @JoinColumn(name="band_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Band", inversedBy="members")
+     * @ORM\JoinColumn(name="band_id", referencedColumnName="id")
      * @var Band
      */
     private $band;
