@@ -19,7 +19,7 @@ class DefaultController extends Controller
         return $this->render(
             'landing.html.twig',
             [
-                'userCount' => 1,
+                'userCount' => $userCount,
             ]
             );
     }
