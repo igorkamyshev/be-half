@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Band;
 use AppBundle\Entity\Group;
 use AppBundle\Entity\User;
 use AppBundle\Utils\LoanManager;
@@ -14,6 +15,9 @@ use Telegram\Bot\Api;
 
 class TelegramController extends Controller
 {
+    /** @var  Api */
+    private $telegram;
+
     /**
      * @Route("/telegram/{apiKey}", name="telegram")
      */
@@ -28,11 +32,14 @@ class TelegramController extends Controller
             throw $this->createAccessDeniedException();
         }
 
-        $telegram = new Api($telegramApiKey);
+        $this->telegram = new Api($telegramApiKey);
 
-        $request = $telegram->getWebhookUpdates();
+        $request = $this->telegram->getWebhookUpdates();
 
         $text = $request["message"]["text"];
+        preg_match('/^\w+/i', $text, $match);
+        $firstWord = $match[0];
+
         $chatId = $request["message"]["chat"]["id"];
         $name = $request["message"]["from"]["username"];
 
@@ -44,38 +51,15 @@ class TelegramController extends Controller
         if ($text) {
             switch ($text) {
                 case '/start':
-                    $replyMarkup = $telegram->replyKeyboardMarkup([
-                        'keyboard' => [
-                            ["Создать группу"],
-                            ["Вступить в группу"],
-                        ],
-                        'resize_keyboard' => true,
-                        'one_time_keyboard' => true,
-                    ]);
-                    $telegram->sendMessage([
-                        'chat_id'      => $chatId,
-                        'text'         => 'Здравствуйте! Я – be-half, помогу следить за тратами "надвоих".',
-                    ]);
-                    $telegram->sendMessage([
-                        'chat_id'      => $chatId,
-                        'text'         => 'Для начала создайте группу, или присоединитесь к существующей.',
-                        'reply_markup' => $replyMarkup,
-                    ]);
+                    $this->handleStart($chatId);
                     break;
                 case 'Создать группу':
-                    if ($user->getBand()) {
-                        $telegram->sendMessage([
-                            'chat_id'      => $chatId,
-                            'text'         => 'Вы уже состоите в группе!',
-                        ]);
-                    } else {
-                        $band = $lm->createBand($user);
-
-                        $telegram->sendMessage([
-                            'chat_id'      => $chatId,
-                            'text'         => 'Группа создана! Индивидуальный номер – ' . $band->getId(),
-                        ]);
-                    }
+                    $this->handleCreateBand($chatId, $user);
+                    break;
+            }
+            switch ($firstWord) {
+                case 'вступить':
+                    $this->handleJoinBand($chatId, $text, $user);
                     break;
             }
         } else {
@@ -83,5 +67,85 @@ class TelegramController extends Controller
         }
 
         return new Response($apiKey);
+    }
+
+    private function handleStart($chatId)
+    {
+        $replyMarkup = $this->telegram->replyKeyboardMarkup([
+            'keyboard' => [
+                ["Создать группу"],
+            ],
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true,
+        ]);
+        $this->telegram->sendMessage([
+            'chat_id'      => $chatId,
+            'text'         => 'Здравствуйте! Я – be-half, помогу следить за тратами "надвоих".',
+        ]);
+        $this->telegram->sendMessage([
+            'chat_id'      => $chatId,
+            'text'         => 'Для начала, создайте группу, или присоединитесь к существующей.',
+        ]);
+        $this->telegram->sendMessage([
+            'chat_id'      => $chatId,
+            'text'         => 'Чтобы присоедениться к группе отправьте мне: вступить #, где # – индивидуальный номер группы.',
+            'reply_markup' => $replyMarkup,
+        ]);
+    }
+
+    private function handleCreateBand($chatId, User $user)
+    {
+        $band = $user->getBand();
+
+        if ($band) {
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Вы уже состоите в группе! Индивидуальный номер – ' . $band->getId(),
+            ]);
+        } else {
+            /** @var LoanManager $lm */
+            $lm = $this->get('loan_manager');
+
+            $band = $lm->createBand($user);
+
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Группа создана! Индивидуальный номер – ' . $band->getId(),
+            ]);
+        }
+    }
+
+    private function handleJoinBand($chatId, $text, User $user) {
+        $band = $user->getBand();
+
+        if ($band) {
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Вы уже состоите в группе! Индивидуальный номер – ' . $band->getId(),
+            ]);
+        } else {
+            /** @var LoanManager $lm */
+            $lm = $this->get('loan_manager');
+
+            $bandId = intval(substr($text, strpos($text," ")));
+
+            $band = $this
+                ->getDoctrine()
+                ->getRepository(Band::class)
+                ->find($bandId);
+            if ($band) {
+                $band = $lm->joinBand($band, $user);
+
+                $this->telegram->sendMessage([
+                    'chat_id'      => $chatId,
+                    'text'         => 'Вы успешно присоеденились к группе!'
+                ]);
+            } else {
+                $this->telegram->sendMessage([
+                    'chat_id'      => $chatId,
+                    'text'         => 'Группы с таким индивидуальным номером не существует.'
+                ]);
+            }
+        }
     }
 }

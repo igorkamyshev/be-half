@@ -64,4 +64,17 @@ class LoanManager
 
         return $band;
     }
+
+    public function joinBand(Band $band, User $user)
+    {
+        $band->addMember($user);
+        $user->setBand($band);
+
+        $this->em->persist($band);
+        $this->em->persist($user);
+
+        $this->em->flush();
+
+        return $band;
+    }
 }
