@@ -65,6 +65,11 @@ class LoanManager
         return $band;
     }
 
+    /**
+     * @param Band $band
+     * @param User $user
+     * @return Band
+     */
     public function joinBand(Band $band, User $user)
     {
         $band->addMember($user);
