@@ -16,7 +16,9 @@ use Telegram\Bot\Api;
 class TelegramController extends Controller
 {
     /* Command Constant */
-
+    const COMMAND_START = '/start';
+    const COMMAND_CREATE_BAND = 'Создать группу';
+    const COMMAND_JOIN_BAND = 'вступить';
 
     /** @var  Api */
     private $telegram;
@@ -57,15 +59,15 @@ class TelegramController extends Controller
 
         if ($text) {
             switch ($text) {
-                case '/start':
+                case self::COMMAND_START:
                     $this->handleStart($chatId);
                     break;
-                case 'Создать группу':
+                case self::COMMAND_CREATE_BAND:
                     $this->handleCreateBand($chatId, $user);
                     break;
             }
             switch ($firstWord) {
-                case 'вступить':
+                case self::COMMAND_JOIN_BAND:
                     $this->handleJoinBand($chatId, $text, $user);
                     break;
             }
