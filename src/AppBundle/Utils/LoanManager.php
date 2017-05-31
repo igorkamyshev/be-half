@@ -54,7 +54,7 @@ class LoanManager
      * @return Group
      */
     public function createGroup(User $user) {
-        $group = new Group();
+        $group = (new Group())->setName('group name');
 
         $this->em->persist($group);
         $this->em->flush();
