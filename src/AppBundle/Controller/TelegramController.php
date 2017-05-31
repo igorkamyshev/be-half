@@ -63,9 +63,7 @@ class TelegramController extends Controller
                     ]);
                     break;
                 case 'Создать группу':
-                    $group = $user->getGroup();
-
-                    if ($group) {
+                    if (false) {
                         $telegram->sendMessage([
                             'chat_id'      => $chatId,
                             'text'         => 'Вы уже состоите в группе!',
