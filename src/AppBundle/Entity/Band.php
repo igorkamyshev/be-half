@@ -19,7 +19,7 @@ class Band
     private $id;
 
     /**
-     * @OneToMany(targetEntity="AppBundle\Entity\User", mappedBy="band")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\User", mappedBy="band")
      * @var ArrayCollection
      */
     private $members;
