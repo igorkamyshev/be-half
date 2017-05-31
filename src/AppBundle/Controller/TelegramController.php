@@ -37,8 +37,12 @@ class TelegramController extends Controller
         $request = $this->telegram->getWebhookUpdates();
 
         $text = $request["message"]["text"];
-        preg_match('/^\w+/i', $text, $match);
-        $firstWord = $match[0];
+
+        try {
+            $firstWord = substr($text, 0, strpos($text, " "));
+        } catch (\Exception $e) {
+            $firstWord = null;
+        }
 
         $chatId = $request["message"]["chat"]["id"];
         $name = $request["message"]["from"]["username"];
@@ -127,12 +131,17 @@ class TelegramController extends Controller
             /** @var LoanManager $lm */
             $lm = $this->get('loan_manager');
 
-            $bandId = intval(substr($text, strpos($text," ")));
+            try {
+                $bandId = intval(substr($text, strpos($text, " ")));
+            } catch (\Exception $e) {
+                $bandId = 0;
+            }
 
             $band = $this
                 ->getDoctrine()
                 ->getRepository(Band::class)
                 ->find($bandId);
+
             if ($band) {
                 $band = $lm->joinBand($band, $user);
 
