@@ -17,12 +17,6 @@ class Group
      */
     private $id;
 
-    /**
-     * @ORM\OneToMany(targetEntity="AppBundle\Entity\User", mappedBy="group")
-     * @var ArrayCollection
-     */
-    private $members;
-
     public function __construct()
     {
         $this->members = new ArrayCollection();
@@ -34,29 +28,5 @@ class Group
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getMembers()
-    {
-        return $this->members;
-    }
-
-    /**
-     * @param User $member
-     * @return Group
-     * @throws \Exception
-     * TODO: Сделать номральную обработку лишнего мебера
-     */
-    public function addMember(User $member)
-    {
-        if (count($this->members) > 1) {
-            throw new \Exception();
-        }
-
-        $this->members->add($member);
-        return $this;
     }
 }
