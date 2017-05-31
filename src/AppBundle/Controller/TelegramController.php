@@ -39,7 +39,7 @@ class TelegramController extends Controller
         $text = $request["message"]["text"];
 
         try {
-            $firstWord = substr($text, 0, strpos($text, " "));
+            $firstWord = strtolower(substr($text, 0, strpos($text, " ")));
         } catch (\Exception $e) {
             $firstWord = null;
         }
