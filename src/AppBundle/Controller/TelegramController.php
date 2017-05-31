@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Group;
 use AppBundle\Entity\User;
+use AppBundle\Utils\LoanManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,9 @@ class TelegramController extends Controller
      */
     public function telegramAction($apiKey)
     {
+        /** @var LoanManager $lm */
+        $lm = $this->get('loan_manager');
+
         $telegramApiKey = $this->getParameter('app.telegram_api_key');
 
         if ($apiKey != $telegramApiKey) {
@@ -32,7 +36,10 @@ class TelegramController extends Controller
         $chatId = $request["message"]["chat"]["id"];
         $name = $request["message"]["from"]["username"];
 
-        $user = $this->getOrCreateUser($chatId, $name);
+        $user = $lm->getOrCreateUser([
+            'chatId' => $chatId,
+            'name'   => $name,
+        ]);
 
         if ($text) {
             switch ($text) {
@@ -55,32 +62,29 @@ class TelegramController extends Controller
                         'reply_markup' => $replyMarkup,
                     ]);
                     break;
+                case 'Создать группу':
+                    $group = $user->getGroup();
+
+                    if ($group) {
+                        $telegram->sendMessage([
+                            'chat_id'      => $chatId,
+                            'text'         => 'Вы уже состоите в группе!',
+                        ]);
+                    } else {
+                        $group = $lm->createGroup($user);
+
+                        $telegram->sendMessage([
+                            'chat_id'      => $chatId,
+                            'text'         => 'Группа создана! Индивидуальный номер – ' . $group->getId(),
+                        ]);
+                    }
+                    break;
             }
         } else {
 
         }
 
         return new Response($apiKey);
-    }
-
-    private function getOrCreateUser($chatId, $name) {
-        $user = $this
-            ->getDoctrine()
-            ->getRepository(User::class)
-            ->findOneBy(['telegramChatId' => $chatId]);
-
-        if (!$user) {
-            $user = (new User())
-                ->setTelegramChatId($chatId)
-                ->setName($name);
-
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-
-            $em->flush();
-        }
-
-        return $user;
     }
 
     private function createGroup(User $user) {
