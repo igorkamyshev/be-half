@@ -17,9 +17,9 @@ class TelegramController extends Controller
 {
     /* Command Constant */
     const COMMAND_START = '/start';
-    const COMMAND_CREATE_BAND = 'Создать группу';
+    const COMMAND_CREATE_BAND = 'создать группу';
     const COMMAND_JOIN_BAND = 'вступить';
-    const COMMAND_STATUS = 'Статус';
+    const COMMAND_STATUS = 'статус';
 
     /** @var  Api */
     private $telegram;
@@ -42,10 +42,10 @@ class TelegramController extends Controller
 
         $request = $this->telegram->getWebhookUpdates();
 
-        $text = $request["message"]["text"];
+        $text = mb_strtolower($request["message"]["text"]);
 
         try {
-            $firstWord = mb_strtolower(substr($text, 0, strpos($text, " ")));
+            $firstWord = substr($text, 0, strpos($text, " "));
         } catch (\Exception $e) {
             $firstWord = null;
         }
@@ -193,12 +193,12 @@ class TelegramController extends Controller
         } elseif ($balance > 0) {
             $this->telegram->sendMessage([
                 'chat_id'      => $chatId,
-                'text'         => 'Вам должны ' . abs($balance) . 'руб.',
+                'text'         => 'Вам должны ' . abs($balance) . ' руб.',
             ]);
         } elseif ($balance < 0) {
             $this->telegram->sendMessage([
                 'chat_id'      => $chatId,
-                'text'         => 'Вы должны ' . abs($balance) . 'руб.',
+                'text'         => 'Вы должны ' . abs($balance) . ' руб.',
             ]);
         }
     }
