@@ -36,6 +36,12 @@ class User
     private $band;
 
     /**
+     * @ORM\Column(type="float")
+     * @var float
+     */
+    private $balance = 0;
+
+    /**
      * @return int
      */
     public function getId()
@@ -94,6 +100,24 @@ class User
     public function setBand($band)
     {
         $this->band = $band;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBalance()
+    {
+        return $this->balance;
+    }
+
+    /**
+     * @param float $balance
+     * @return User
+     */
+    public function setBalance($balance)
+    {
+        $this->balance = $balance;
         return $this;
     }
 }

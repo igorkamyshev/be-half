@@ -19,6 +19,7 @@ class TelegramController extends Controller
     const COMMAND_START = '/start';
     const COMMAND_CREATE_BAND = 'Создать группу';
     const COMMAND_JOIN_BAND = 'вступить';
+    const COMMAND_STATUS = 'Статус';
 
     /** @var  Api */
     private $telegram;
@@ -64,6 +65,9 @@ class TelegramController extends Controller
                     break;
                 case self::COMMAND_CREATE_BAND:
                     $this->handleCreateBand($chatId, $user);
+                    break;
+                case self::COMMAND_STATUS:
+                    $this->handleStatus($chatId, $user);
                     break;
             }
             switch ($firstWord) {
@@ -152,14 +156,50 @@ class TelegramController extends Controller
 
                 $this->telegram->sendMessage([
                     'chat_id'      => $chatId,
-                    'text'         => 'Вы успешно присоеденились к группе!'
+                    'text'         => 'Вы успешно присоеденились к группе!',
                 ]);
             } else {
                 $this->telegram->sendMessage([
                     'chat_id'      => $chatId,
-                    'text'         => 'Группы с таким индивидуальным номером не существует.'
+                    'text'         => 'Группы с таким индивидуальным номером не существует.',
                 ]);
             }
+        }
+    }
+
+    private function handleStatus($chatId, User $user)
+    {
+        $band = $user->getBand();
+
+        if ($band) {
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Вы состоите в группе. Индивидуальный номер – ' . $band->getId(),
+            ]);
+        } else {
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Вы не состоите в группе.',
+            ]);
+        }
+
+        $balance = $user->getBalance();
+
+        if ($balance == 0) {
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Никто никому ничего не должен!',
+            ]);
+        } elseif ($balance > 0) {
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Вам должны ' . abs($balance) . 'руб.',
+            ]);
+        } elseif ($balance < 0) {
+            $this->telegram->sendMessage([
+                'chat_id'      => $chatId,
+                'text'         => 'Вы должны ' . abs($balance) . 'руб.',
+            ]);
         }
     }
 }
