@@ -94,6 +94,8 @@ class TelegramBot
 
         $messages[] = "Здравствуйте! Я – be half. Помогу следить за совместными тратами.";
 
+        $this->sendMessagesToUser($user, $messages);
+
         return true;
     }
 
