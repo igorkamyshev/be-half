@@ -112,7 +112,7 @@ class TelegramBot
         } catch (UserAlreadyInBandException $e) {
             $band = $e->band;
 
-            $messages[] = 'Вы уже состоите в группе.';
+            $messages[] = $e->getMessage();
         }
 
         $messages[] = 'Индивидуальный номер – ' . $band->getId() . '.';
