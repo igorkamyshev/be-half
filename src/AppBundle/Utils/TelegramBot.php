@@ -284,7 +284,7 @@ class TelegramBot
             $partnerMessages = [];
             $partnerMessages[] =
 "Новая транзакция:
-- " . $transaction->getAmount() . " руб. ( " . $transaction->getComment() . ")";
+- " . $transaction->getAmount() . " руб. (" . $transaction->getComment() . ")";
 
             $this->sendMessagesToUser($partner, $partnerMessages);
         } catch (UserIsNotInBandException $e) {
