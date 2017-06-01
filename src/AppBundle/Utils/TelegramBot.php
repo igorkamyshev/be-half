@@ -8,6 +8,7 @@ use AppBundle\Entity\User;
 use AppBundle\Utils\Exception\BandIsFullException;
 use AppBundle\Utils\Exception\BandNotExistException;
 use AppBundle\Utils\Exception\UserAlreadyInBandException;
+use AppBundle\Utils\Exception\UserIsNotInBandException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Telegram\Bot\Api;
 
@@ -82,6 +83,7 @@ class TelegramBot
                 $this->handleJoinBandCommand($user, $params);
                 break;
             case self::COMMAND_LEAVE_BAND:
+                $this->handleLeaveBandCommand($user);
                 break;
             case self::COMMAND_INFO_BAND;
                 $this->handleInfoBandCommand($user);
@@ -153,6 +155,22 @@ class TelegramBot
             $messages[] = $e->getMessage();
         } catch (BandIsFullException $e) {
             $messages[] = $e->getMessage();
+        }
+
+        $this->sendMessagesToUser($user, $messages);
+
+        return true;
+    }
+
+    private function handleLeaveBandCommand(User $user)
+    {
+        $messages = [];
+
+        try {
+            $user = $this->lm->leaveGroup($user);
+            $messages[] = 'Вы успешно покинули группу.';
+        } catch (UserIsNotInBandException $e) {
+            $messages[] = 'Вы не состоите в группе.';
         }
 
         $this->sendMessagesToUser($user, $messages);

@@ -8,6 +8,7 @@ use AppBundle\Entity\Transaction;
 use AppBundle\Entity\User;
 use AppBundle\Utils\Exception\BandNotExistException;
 use AppBundle\Utils\Exception\UserAlreadyInBandException;
+use AppBundle\Utils\Exception\UserIsNotInBandException;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
@@ -95,16 +96,28 @@ class LoanManager
         return $band;
     }
 
+    /**
+     * @param $bandId
+     * @param $user
+     * @return Band
+     * @throws BandNotExistException
+     */
     public function joinBandById($bandId, $user)
     {
         $band = $this->em->getRepository(Band::class)->find($bandId);
-        if ($band) {
-            return $this->joinBand($band, $user);
-        } else {
+
+        if (!$band) {
             throw new BandNotExistException($bandId);
         }
+
+        return $this->joinBand($band, $user);
     }
 
+    /**
+     * @param User $user
+     * @param $amount
+     * @return Transaction
+     */
     public function createTransaction(User $user, $amount)
     {
         $transaction = (new Transaction())
@@ -122,5 +135,28 @@ class LoanManager
         $partner->setBalance($partner->getBalance() - $transaction->getAmount());
 
         $this->em->flush();
+
+        return $transaction;
+    }
+
+    /**
+     * @param User $user
+     * @return User
+     * @throws UserIsNotInBandException
+     */
+    public function leaveGroup(User $user)
+    {
+        $band = $user->getBand();
+
+        if (!$band) {
+            throw new UserIsNotInBandException();
+        }
+
+        $band->removeMember($user);
+        $user->setBand(null);
+
+        $this->em->flush();
+
+        return $user;
     }
 }
