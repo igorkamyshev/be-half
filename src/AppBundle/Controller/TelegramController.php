@@ -2,14 +2,10 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Band;
-use AppBundle\Entity\Group;
 use AppBundle\Entity\User;
-use AppBundle\Utils\LoanManager;
 use AppBundle\Utils\TelegramBot;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Telegram\Bot\Api;
@@ -33,6 +29,7 @@ class TelegramController extends Controller
         $chatId = $request["message"]["chat"]["id"];
         $name = $request["message"]["from"]["username"];
 
+        /** @var User $user */
         $user = $this->get('loan_manager')->getOrCreateUser([
             'chatId' => $chatId,
             'name'   => $name,
