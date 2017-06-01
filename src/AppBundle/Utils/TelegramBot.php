@@ -18,6 +18,7 @@ class TelegramBot
     const COMMAND_CREATE_BAND = 'создать';
     const COMMAND_LEAVE_BAND = 'покинуть';
     const COMMAND_JOIN_BAND = 'вступить';
+    const COMMAND_INFO_BAND = 'моя';
     const COMMAND_STATUS = 'статус';
     const COMMAND_HELP = 'помощь';
     const COMMAND_NEW_TRANSACTION = 'transaction';
@@ -82,6 +83,9 @@ class TelegramBot
                 break;
             case self::COMMAND_LEAVE_BAND:
                 break;
+            case self::COMMAND_INFO_BAND;
+                $this->handleInfoBandCommand($user);
+                break;
             case self::COMMAND_STATUS:
                 break;
             case self::COMMAND_HELP:
@@ -134,17 +138,12 @@ class TelegramBot
 
             $partner = $band->getPartner($user);
 
-            if ($partner->getName()) {
-                $messages[] = 'Я буду помогать вести ваши с ' . $partner->getName() . ' расходы.';
-            }
+            $messages[] = 'Я буду помогать вести ваши с ' . $partner->getName() . ' расходы.';
 
             // TODO: Тут расчет на то, что у партнера тоже бот. Надо это в будущем исправить.
             $partnerMessages = [];
             $partnerMessages[] = 'К группе присодинился ваш друг.';
-
-            if($user->getName()) {
-                $partnerMessages[] = 'Я буду помогать вести ваши с ' . $user->getName() . ' расходы.';
-            }
+            $partnerMessages[] = 'Я буду помогать вести ваши с ' . $user->getName() . ' расходы.';
 
             $this->sendMessagesToUser($partner, $partnerMessages);
         } catch (UserAlreadyInBandException $e) {
@@ -158,6 +157,25 @@ class TelegramBot
         $this->sendMessagesToUser($user, $messages);
 
         return true;
+    }
+
+    private function handleInfoBandCommand(User $user) {
+        $messages = [];
+
+        $band = $user->getBand();
+        if ($band) {
+            $messages[] = 'Вы состите в группе. Индивидуальный номер – ' . $band->getId() . '.';
+            $partner = $band->getPartner($user);
+            if ($partner) {
+                $messages[] = 'Ваш друг – ' . $partner->getName() . '.';
+            } else {
+                $messages[] = 'В ней никого кроме вас.';
+            }
+        } else {
+            $messages[] = 'Не могу предоставить информацию. Вы не состоите в группе.';
+        }
+
+        $this->sendMessagesToUser($user, $messages);
     }
 
     private function handleHelpCommand(User $user)
