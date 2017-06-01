@@ -96,6 +96,7 @@ class TelegramBot
                 $this->handleHelpCommand($user);
                 break;
             case self::COMMAND_NEW_TRANSACTION:
+                $this->handleNewTransaction($user, $params);
                 break;
         }
 
