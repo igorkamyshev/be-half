@@ -8,6 +8,7 @@ use AppBundle\Entity\Transaction;
 use AppBundle\Entity\User;
 use AppBundle\Utils\Exception\BandNotExistException;
 use AppBundle\Utils\Exception\UserAlreadyInBandException;
+use AppBundle\Utils\Exception\UserDoesntHavePartnerException;
 use AppBundle\Utils\Exception\UserIsNotInBandException;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -115,22 +116,36 @@ class LoanManager
 
     /**
      * @param User $user
-     * @param $amount
+     * @param float $amount
+     * @param string $comment
      * @return Transaction
+     * @throws UserDoesntHavePartnerException
+     * @throws UserIsNotInBandException
      */
-    public function createTransaction(User $user, $amount)
+    public function createTransaction(User $user, $amount, $comment = null)
     {
+        $band = $user->getBand();
+        if (!$band) {
+            throw new UserIsNotInBandException();
+        }
+
+        $partner = $user->getBand()->getPartner($user);
+        if (!$partner) {
+            throw new UserDoesntHavePartnerException();
+        }
+
         $transaction = (new Transaction())
             ->setAmount($amount)
-            ->setUser($user);
+            ->setUser($user)
+            ->setBand($band)
+            ->setComment($comment);
 
         $this->em->persist($transaction);
 
         $user->addTransaction($transaction);
         $user->setBalance($user->getBalance() + $transaction->getAmount());
 
-        /** @var User $partner */
-        $partner = $user->getBand()->getPartner($user);
+        $band->addTransaction($transaction);
 
         $partner->setBalance($partner->getBalance() - $transaction->getAmount());
 

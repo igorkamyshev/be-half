@@ -8,6 +8,7 @@ use AppBundle\Entity\User;
 use AppBundle\Utils\Exception\BandIsFullException;
 use AppBundle\Utils\Exception\BandNotExistException;
 use AppBundle\Utils\Exception\UserAlreadyInBandException;
+use AppBundle\Utils\Exception\UserDoesntHavePartnerException;
 use AppBundle\Utils\Exception\UserIsNotInBandException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Telegram\Bot\Api;
@@ -262,6 +263,33 @@ class TelegramBot
             } elseif ($balance < 0) {
                 $messages[] = 'Вы должны другу ' . abs($balance) . ' руб.';
             }
+        }
+
+        $this->sendMessagesToUser($user, $messages);
+
+        return true;
+    }
+
+    private function handleNewTransaction(User $user, array $params)
+    {
+        $messages = [];
+
+        try {
+            $transaction = $this->lm->createTransaction($user, $params['amount'] / 2, $params['comment']);
+
+            // TODO: Тут расчет на то, что у партнера тоже бот. Надо это в будущем исправить.
+            $partner = $user->getBand()->getPartner($user);
+
+            $partnerMessages = [];
+            $partnerMessages[] =
+"Новая транзакция:
+- " . $transaction->getAmount() . " руб. ( " . $transaction->getComment() . ")";
+
+            $this->sendMessagesToUser($partner, $partnerMessages);
+        } catch (UserIsNotInBandException $e) {
+            $messages[] = $e->getMessage();
+        } catch (UserDoesntHavePartnerException $e) {
+            $messages[] = $e->getMessage();
         }
 
         $this->sendMessagesToUser($user, $messages);

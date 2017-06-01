@@ -38,6 +38,11 @@ class Transaction
      */
     private $amount;
 
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    private $comment;
 
     /**
      * @return int
@@ -98,6 +103,24 @@ class Transaction
     public function setAmount($amount)
     {
         $this->amount = $amount;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @param string $comment
+     * @return Transaction
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
         return $this;
     }
 }
