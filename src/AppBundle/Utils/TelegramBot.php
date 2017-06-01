@@ -78,7 +78,7 @@ class TelegramBot
                 $this->handleCreateBandCommand($user);
                 break;
             case self::COMMAND_JOIN_BAND:
-                $this->handleJoinBand($user, $params);
+                $this->handleJoinBandCommand($user, $params);
                 break;
             case self::COMMAND_LEAVE_BAND:
                 break;
@@ -124,7 +124,7 @@ class TelegramBot
         return true;
     }
 
-    private function handleJoinBand(User $user, array $params)
+    private function handleJoinBandCommand(User $user, array $params)
     {
         $messages = [];
 
@@ -135,7 +135,7 @@ class TelegramBot
             $partner = $band->getPartner($user);
 
             if ($partner->getName()) {
-                $messages[] = 'Я буду помогать вести ваши с ' . $partner->getName() . 'расходы.';
+                $messages[] = 'Я буду помогать вести ваши с ' . $partner->getName() . ' расходы.';
             }
 
             // TODO: Тут расчет на то, что у партнера тоже бот. Надо это в будущем исправить.
@@ -143,7 +143,7 @@ class TelegramBot
             $partnerMessages[] = 'К группе присодинился ваш друг.';
 
             if($user->getName()) {
-                $partnerMessages[] = 'Я буду помогать вести ваши с ' . $user->getName() . 'расходы.';
+                $partnerMessages[] = 'Я буду помогать вести ваши с ' . $user->getName() . ' расходы.';
             }
 
             $this->sendMessagesToUser($partner, $partnerMessages);
