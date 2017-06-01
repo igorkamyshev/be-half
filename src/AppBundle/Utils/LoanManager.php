@@ -6,8 +6,10 @@ namespace AppBundle\Utils;
 use AppBundle\Entity\Band;
 use AppBundle\Entity\Transaction;
 use AppBundle\Entity\User;
+use AppBundle\Utils\Exception\BandNotExistException;
 use AppBundle\Utils\Exception\UserAlreadyInBandException;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 class LoanManager
 {
@@ -58,7 +60,6 @@ class LoanManager
      */
     public function createBand(User $user) {
         $band = $user->getBand();
-
         if ($band) {
             throw new UserAlreadyInBandException($band);
         }
@@ -78,15 +79,30 @@ class LoanManager
      * @param Band $band
      * @param User $user
      * @return Band
+     * @throws UserAlreadyInBandException
      */
     public function joinBand(Band $band, User $user)
     {
+        if ($user->getBand()) {
+            throw new UserAlreadyInBandException($user->getBand());
+        }
+
         $band->addMember($user);
         $user->setBand($band);
 
         $this->em->flush();
 
         return $band;
+    }
+
+    public function joinBandById($bandId, $user)
+    {
+        $band = $this->em->getRepository(Band::class)->find($bandId);
+        if ($band) {
+            return $this->joinBand($band, $user);
+        } else {
+            throw new BandNotExistException($bandId);
+        }
     }
 
     public function createTransaction(User $user, $amount)
@@ -101,14 +117,7 @@ class LoanManager
         $user->setBalance($user->getBalance() + $transaction->getAmount());
 
         /** @var User $partner */
-        $partner = null;
-
-        foreach ($user->getBand()->getMembers() as $member) {
-            if ($member->getId() != $user->getId()) {
-                $partner = $member;
-                break;
-            }
-        }
+        $partner = $user->getBand()->getPartner($user);
 
         $partner->setBalance($partner->getBalance() - $transaction->getAmount());
 

@@ -3,7 +3,10 @@
 namespace AppBundle\Utils;
 
 
+use AppBundle\Entity\Band;
 use AppBundle\Entity\User;
+use AppBundle\Utils\Exception\BandIsFullException;
+use AppBundle\Utils\Exception\BandNotExistException;
 use AppBundle\Utils\Exception\UserAlreadyInBandException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Telegram\Bot\Api;
@@ -75,6 +78,7 @@ class TelegramBot
                 $this->handleCreateBandCommand($user);
                 break;
             case self::COMMAND_JOIN_BAND:
+                $this->handleJoinBand($user, $params);
                 break;
             case self::COMMAND_LEAVE_BAND:
                 break;
@@ -114,6 +118,42 @@ class TelegramBot
         }
 
         $messages[] = 'Индивидуальный номер – ' . $band->getId() . '.';
+
+        $this->sendMessagesToUser($user, $messages);
+
+        return true;
+    }
+
+    private function handleJoinBand(User $user, array $params)
+    {
+        $messages = [];
+
+        try {
+            $band = $this->lm->joinBandById($params[0], $user);
+            $messages[] = 'Вы вступили в группу.';
+
+            $partner = $band->getPartner($user);
+
+            if ($partner->getName()) {
+                $messages[] = 'Я буду помогать вести ваши с ' . $partner->getName() . 'расходы.';
+            }
+
+            // TODO: Тут расчет на то, что у партнера тоже бот. Надо это в будущем исправить.
+            $partnerMessages = [];
+            $partnerMessages[] = 'К группе присодинился ваш друг.';
+
+            if($user->getName()) {
+                $partnerMessages[] = 'Я буду помогать вести ваши с ' . $user->getName() . 'расходы.';
+            }
+
+            $this->sendMessagesToUser($partner, $partnerMessages);
+        } catch (UserAlreadyInBandException $e) {
+            $messages[] = $e->getMessage();
+        } catch (BandNotExistException $e) {
+            $messages[] = $e->getMessage();
+        } catch (BandIsFullException $e) {
+            $messages[] = $e->getMessage();
+        }
 
         $this->sendMessagesToUser($user, $messages);
 

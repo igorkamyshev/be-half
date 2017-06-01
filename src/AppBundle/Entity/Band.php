@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Utils\Exception\BandIsFullException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -55,10 +56,14 @@ class Band
     /**
      * @param User $member
      * @return Band
-     * TODO: Запретить добавлять больше двух членов
+     * @throws BandIsFullException
      */
     public function addMember(User $member)
     {
+        if (count($this->members) > 1) {
+            throw new BandIsFullException($this);
+        }
+
         $this->members->add($member);
         return $this;
     }
@@ -99,5 +104,18 @@ class Band
     {
         $this->transactions->removeElement($transaction);
         return $this;
+    }
+
+    /**
+     * @param User $user
+     * @return User
+     */
+    public function getPartner(User $user)
+    {
+        foreach ($this->members as $member) {
+            if ($member->getId() != $user->getId()) {
+                return $member;
+            }
+        }
     }
 }

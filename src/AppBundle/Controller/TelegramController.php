@@ -53,4 +53,13 @@ class TelegramController extends Controller
 
         return new Response(implode($params));
     }
+
+    /**
+     * @Route("/test", name="test")
+     */
+    public function test()
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->find(12);
+        return new Response($user);
+    }
 }
