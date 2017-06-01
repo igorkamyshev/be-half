@@ -107,11 +107,9 @@ class TelegramBot
 
         try {
             $band = $this->lm->createBand($user);
-
             $messages[] = 'Группа создана.';
         } catch (UserAlreadyInBandException $e) {
-            $band = $e->band;
-
+            $band = $e->getBand();
             $messages[] = $e->getMessage();
         }
 
