@@ -167,8 +167,16 @@ class TelegramBot
         $messages = [];
 
         try {
+            $partner = $user->getBand()->getPartner($user);
+
             $user = $this->lm->leaveGroup($user);
             $messages[] = 'Вы успешно покинули группу.';
+
+            // TODO: Тут расчет на то, что у партнера тоже бот. Надо это в будущем исправить.
+            $partnerMessages = [];
+            $partnerMessages[] = 'Ваш друг покинул группу';
+
+            $this->sendMessagesToUser($partner, $partnerMessages);
         } catch (UserIsNotInBandException $e) {
             $messages[] = 'Вы не состоите в группе.';
         }
