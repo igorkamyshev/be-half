@@ -87,6 +87,7 @@ class TelegramBot
                 $this->handleInfoBandCommand($user);
                 break;
             case self::COMMAND_STATUS:
+                $this->handleStatusCommand($user);
                 break;
             case self::COMMAND_HELP:
                 $this->handleHelpCommand($user);
@@ -176,6 +177,8 @@ class TelegramBot
         }
 
         $this->sendMessagesToUser($user, $messages);
+
+        return true;
     }
 
     private function handleHelpCommand(User $user)
@@ -211,6 +214,29 @@ class TelegramBot
 200 печенье
 
 На счет друга будет записано 100 рублей, он получит уведомление об этом с комментарием 'печенье'.";
+
+        $this->sendMessagesToUser($user, $messages);
+
+        return true;
+    }
+
+    private function handleStatusCommand(User $user)
+    {
+        $messages = [];
+
+        if (!$user->getBand()) {
+            $messages[] = 'Вы не состоите в группе, о каком статусе речь?';
+        } else {
+            $balance = $user->getBalance();
+
+            if ($balance == 0) {
+                $messages[] = 'Никто никому ничего не должен.';
+            } elseif ($balance > 0) {
+                $messages[] = 'Друг должен вам ' . abs($balance) . 'руб.';
+            } elseif ($balance < 0) {
+                $messages[] = 'Вы должны другу ' . abs($balance) . 'руб.';
+            }
+        }
 
         $this->sendMessagesToUser($user, $messages);
 
