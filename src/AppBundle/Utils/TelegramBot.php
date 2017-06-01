@@ -232,9 +232,9 @@ class TelegramBot
             if ($balance == 0) {
                 $messages[] = 'Никто никому ничего не должен.';
             } elseif ($balance > 0) {
-                $messages[] = 'Друг должен вам ' . abs($balance) . 'руб.';
+                $messages[] = 'Друг должен вам ' . abs($balance) . ' руб.';
             } elseif ($balance < 0) {
-                $messages[] = 'Вы должны другу ' . abs($balance) . 'руб.';
+                $messages[] = 'Вы должны другу ' . abs($balance) . ' руб.';
             }
         }
 
