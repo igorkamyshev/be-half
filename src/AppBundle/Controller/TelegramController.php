@@ -27,39 +27,24 @@ class TelegramController extends Controller
             throw $this->createAccessDeniedException();
         }
 
-        /** @var Api $api */
-        $api = new Api($telegramApiKey);
-
-        /** @var TelegramBot $bot */
-        $bot = $this->get('telegram_bot');
-
-        /** @var LoanManager $lm */
-        $lm = $this->get('loan_manager');
-
-        $request = $api->getWebhookUpdates();
+        $request = (new Api($telegramApiKey))->getWebhookUpdates();
 
         $text = $request["message"]["text"];
         $chatId = $request["message"]["chat"]["id"];
         $name = $request["message"]["from"]["username"];
 
-        $user = $lm->getOrCreateUser([
+        $user = $this->get('loan_manager')->getOrCreateUser([
             'chatId' => $chatId,
             'name'   => $name,
         ]);
+
+        /** @var TelegramBot $bot */
+        $bot = $this->get('telegram_bot');
 
         list($command, $params) = $bot->parseTextToCommand($text);
 
         $response = $bot->handleCommand($command, $params, $user);
 
-        return new Response(implode($params));
-    }
-
-    /**
-     * @Route("/test", name="test")
-     */
-    public function test()
-    {
-        $user = $this->getDoctrine()->getRepository(User::class)->find(12);
-        return new Response($user);
+        return new Response('ok');
     }
 }
