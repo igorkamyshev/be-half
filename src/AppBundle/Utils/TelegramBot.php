@@ -4,6 +4,7 @@ namespace AppBundle\Utils;
 
 
 use AppBundle\Entity\User;
+use AppBundle\Utils\Exception\UserAlreadyInBandException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Telegram\Bot\Api;
 
@@ -93,6 +94,27 @@ class TelegramBot
         $messages = [];
 
         $messages[] = "Здравствуйте! Я – be half. Помогу следить за совместными тратами.";
+
+        $this->sendMessagesToUser($user, $messages);
+
+        return true;
+    }
+
+    private function handleCreateBand(User $user)
+    {
+        $messages = [];
+
+        try {
+            $band = $this->lm->createBand($user);
+
+            $messages[] = 'Группа создана.';
+        } catch (UserAlreadyInBandException $e) {
+            $band = $e->band;
+
+            $messages[] = 'Вы уже состоите в группе.';
+        }
+
+        $messages[] = 'Индивидуальный номер – ' . $band->getId() . '.';
 
         $this->sendMessagesToUser($user, $messages);
 

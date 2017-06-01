@@ -6,6 +6,7 @@ namespace AppBundle\Utils;
 use AppBundle\Entity\Band;
 use AppBundle\Entity\Transaction;
 use AppBundle\Entity\User;
+use AppBundle\Utils\Exception\UserAlreadyInBandException;
 use Doctrine\ORM\EntityManager;
 
 class LoanManager
@@ -53,8 +54,15 @@ class LoanManager
     /**
      * @param User $user
      * @return Band
+     * @throws UserAlreadyInBandException
      */
     public function createBand(User $user) {
+        $band = $user->getBand();
+
+        if ($band) {
+            throw new UserAlreadyInBandException($band);
+        }
+
         $band = (new Band())->addMember($user);
 
         $this->em->persist($band);
