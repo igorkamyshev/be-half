@@ -5,3 +5,6 @@ services:
     loan_manager:
         class: AppBundle\Utils\LoanManager
         arguments: ['@doctrine.orm.entity_manager']
+    telegram_bot:
+        class: AppBundle\Utils\TelegramBot
+        arguments: ["@service_container", "@loan_manager"]
