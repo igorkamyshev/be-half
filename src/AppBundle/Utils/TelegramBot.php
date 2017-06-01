@@ -72,6 +72,7 @@ class TelegramBot
                 $this->handleHelpCommand($user);
                 break;
             case self::COMMAND_CREATE_BAND:
+                $this->handleCreateBandCommand($user);
                 break;
             case self::COMMAND_JOIN_BAND:
                 break;
@@ -100,7 +101,7 @@ class TelegramBot
         return true;
     }
 
-    private function handleCreateBand(User $user)
+    private function handleCreateBandCommand(User $user)
     {
         $messages = [];
 
