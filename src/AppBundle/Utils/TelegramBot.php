@@ -67,6 +67,7 @@ class TelegramBot
     {
         switch ($command) {
             case self::COMMAND_START:
+                $this->handleStartCommand($user);
                 $this->handleHelpCommand($user);
                 break;
             case self::COMMAND_CREATE_BAND:
@@ -89,8 +90,13 @@ class TelegramBot
 
     private function handleStartCommand(User $user)
     {
+        $messages = [];
+
+        $messages[] = "Здравствуйте! Я – be half. Помогу следить за совместными тратами.";
+
         return true;
     }
+
     private function handleHelpCommand(User $user)
     {
         $messages = [];
