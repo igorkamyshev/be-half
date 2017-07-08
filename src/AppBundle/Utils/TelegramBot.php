@@ -278,6 +278,10 @@ class TelegramBot
         try {
             $transaction = $this->lm->createTransaction($user, $params['amount'] / 2, $params['comment']);
 
+            $messages[] = $partnerMessages[] =
+"Новая транзакция:
++ " . $transaction->getAmount() . " руб. (" . $transaction->getComment() . ")";
+
             // TODO: Тут расчет на то, что у партнера тоже бот. Надо это в будущем исправить.
             $partner = $user->getBand()->getPartner($user);
 
