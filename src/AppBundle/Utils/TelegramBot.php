@@ -289,7 +289,7 @@ class TelegramBot
         $transactions = $this->container
             ->get('doctrine.orm.entity_manager')
             ->getRepository(Transaction::class)
-            ->findLast(self::DEFAULT_HISTORY_LENGTH);
+            ->findLastByUser($user, self::DEFAULT_HISTORY_LENGTH);
 
         foreach ($transactions as $transaction) {
             $message = '';
