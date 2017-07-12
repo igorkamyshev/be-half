@@ -4,6 +4,7 @@ namespace AppBundle\Utils;
 
 
 use AppBundle\Entity\Band;
+use AppBundle\Entity\Transaction;
 use AppBundle\Entity\User;
 use AppBundle\Utils\Exception\BandIsFullException;
 use AppBundle\Utils\Exception\BandNotExistException;
@@ -23,7 +24,10 @@ class TelegramBot
     const COMMAND_INFO_BAND = 'моя';
     const COMMAND_STATUS = 'статус';
     const COMMAND_HELP = 'помощь';
+    const COMMAND_HISTORY = 'история';
     const COMMAND_NEW_TRANSACTION = 'transaction';
+
+    const DEFAULT_HISTORY_LENGTH = 10;
 
     /** @var ContainerInterface */
     private $container;
@@ -94,6 +98,9 @@ class TelegramBot
                 break;
             case self::COMMAND_HELP:
                 $this->handleHelpCommand($user);
+                break;
+            case self::COMMAND_HISTORY:
+                $this->handleHistoryCommand($user);
                 break;
             case self::COMMAND_NEW_TRANSACTION:
                 $this->handleNewTransaction($user, $params);
@@ -231,6 +238,9 @@ class TelegramBot
 моя группа
 || выводит индивидуальный номер и членов группы;
 
+история
+|| выводит последние " . self::DEFAULT_HISTORY_LENGTH . " транзакций;
+
 статус
 || выводит состояние счета.";
 
@@ -264,6 +274,39 @@ class TelegramBot
             } elseif ($balance < 0) {
                 $messages[] = 'Вы должны другу ' . abs($balance) . ' руб.';
             }
+        }
+
+        $this->sendMessagesToUser($user, $messages);
+
+        return true;
+    }
+
+    private function handleHistoryCommand(User $user)
+    {
+        $messages = [];
+
+        /** @var Transaction[] $transactions */
+        $transactions = $this->container
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository(Transaction::class)
+            ->findLast(self::DEFAULT_HISTORY_LENGTH);
+
+        foreach ($transactions as $transaction) {
+            $message = '';
+
+            if ($transaction->getUser()->getId() == $user->getId()) {
+                $message .= '+ ';
+            } else {
+                $message .= '- ';
+            }
+
+            $message .= $transaction->getAmount() . ' руб.';
+
+            if ($transaction->getComment()) {
+                $message .= ' (' . $transaction->getComment() . ')';
+            }
+
+            $messages[] = $message;
         }
 
         $this->sendMessagesToUser($user, $messages);
